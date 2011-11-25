@@ -1,4 +1,6 @@
 import org.eclipse.jgit.lib.*;
+import org.eclipse.jgit.dircache.*;
+import org.eclipse.jgit.treewalk.*;
 import java.io.*;
 
 class Prompt {
@@ -7,7 +9,7 @@ class Prompt {
     System.out.println("Test");
 
     Repository repo = new RepositoryBuilder()
-        .setGitDir(new File(".git"))
+        .setGitDir(new File("./.git/"))
         .readEnvironment()
         .findGitDir()
         .build();
@@ -17,6 +19,13 @@ class Prompt {
         return;
     }
 
-    System.out.println(repo.getRepositoryState());
+    String branch = repo.getBranch();
+    IndexDiff index = new IndexDiff(repo, "HEAD", new FileTreeIterator(repo));
+    index.diff();
+
+    System.out.println("Branch: " + branch);
+    System.out.println("Changed not staged: " + index.getModified());
+    System.out.println("Staged: " + index.getChanged()); 
+    
   }
 }
