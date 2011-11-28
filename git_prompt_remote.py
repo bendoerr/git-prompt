@@ -16,7 +16,7 @@ def check_status_with_remote(repo, curr_tb):
 
     cache = anydbm.open('/cygdrive/c/sanctuary/home/bendoerr/.git_prompt', 'c')
 
-    if key + " checked" in cache: # and ((float(datetime.fromtimestamp(cache[key + " checked"])) + expire_after) > datetime.now()):
+    if key + " checked" in cache and ((datetime.fromtimestamp(float(cache[key + " checked"])) + expire_after) > datetime.now()):
         state = int(cache[key + " state"])
     else:
         state = check_status_with_remote_no_cache(repo, curr_tb) #{'checked': datetime.now(), 'state': }
