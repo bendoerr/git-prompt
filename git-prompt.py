@@ -1,10 +1,8 @@
-from Git import *
+from git import *
 
 repo = Repo()                                                                   #=> <git.Repo "/cygdrive/c/sanctuary/projects/git-prompt/.git">
 
 curr_b = repo.head.ref.name                                                     #=> 'master'
-print("Branch" + curr_b)
-
 curr_tb = repo.head.ref.tracking_branch()
 
 if curr_tb:
@@ -22,3 +20,11 @@ if curr_tb:
     else:
         print("Up to date")
 
+not_staged = bool(repo.index.diff(None))
+staged = bool(repo.index.diff('HEAD'))
+
+if not_staged:
+    print("Has Items Not Staged")
+
+if staged:
+    print("Has Items Staged")
