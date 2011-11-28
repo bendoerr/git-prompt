@@ -6,6 +6,7 @@ try:
 except InvalidGitRepositoryError:
     exit()
 
+# Initialize Colorama
 init()
 
 remote_color = Style.BRIGHT + Fore.RED
@@ -21,15 +22,28 @@ if curr_tb:
                                     "refs/heads/" + curr_rb[1]).split("\t")[0]  #=> 'bf1e66aa5ec90325bf358469d1b13fac6777c045'
 
     if curr_commit != curr_r_commit:
-        # We differ. We might be ahead (curr_rb_commit would be in our history).
-        # We might be behind (curr_commit is in their history) or we might have
-        # diverged.
-        remote_color = Fore.MAGENTA
+        remote_commits = Git().cherry(curr_b, "remotes/" + curr_tb.name)        #=> ''
+        local_commits = Git().cherry()                                          #=> ''
+
+        if bool(remote_commits) == False and bool(local_commits) == False:
+            repo.remote(curr_rb[0]).fetch()
+
+        remote_commits = Git().cherry(curr_b, "remotes/" + curr_tb.name)        #=> '+ cb601efd16ecb322c349378a4393620e7b05301c'
+        local_commits = Git().cherry()                                          #=> '+ a305fad893e72ca4ad78171b18977227cb61bf25\n+ 4155609d8350c0112280b419df6b0f6c7ec641b7'
+
+        if bool(remote_commits):
+            if bool(local_commits):
+                # Diverged
+                remote_color = Back.MAGENTA + Style.BRIGHT + Fore.WHITE
+            else:
+                remote_color = Fore.MAGENTA
+        elif bool(local_commits):
+            remote_color = Fore.YELLOW
     else:
         remote_color = Fore.WHITE
 
-not_staged = repo.index.diff(None)
-staged = repo.index.diff('HEAD')
+not_staged = repo.index.diff(None)                                              #=> [<git.diff.Diff object at 0x7ecafa74>]
+staged = repo.index.diff('HEAD')                                                #=> [<git.diff.Diff object at 0x7ecafa74>]
 
 local_color = Fore.WHITE
 
