@@ -1,10 +1,8 @@
+import anydbm
 from git import *
-from datetime import *
+from datetime import datetime, timedelta
+import time
 
-# {'/cygdrive/c/sanctuary/projects/git-prompt/.git': {
-#                                                     checked: datetime.datetime(2011, 11, 28, 13, 56, 27, 264585),
-#                                                     state: LocalRemoteState.BEHIND }
-cache = {}
 expire_after = timedelta(hours=6)
 
 class LocalRemoteState:
@@ -14,15 +12,21 @@ class LocalRemoteState:
     AHEAD = 5
 
 def check_status_with_remote(repo, curr_tb):
-    key = (repo.git_dir, curr_tb.path)
+    key = repo.git_dir + " " + curr_tb.path
 
-    if key in cache and ((cache[key]['state']['checked'] + expire_after) > datetime.now()):
-        state = cache[key]
+    cache = anydbm.open('/cygdrive/c/sanctuary/home/bendoerr/.git_prompt', 'c')
+
+    if key + " checked" in cache: # and ((float(datetime.fromtimestamp(cache[key + " checked"])) + expire_after) > datetime.now()):
+        state = int(cache[key + " state"])
     else:
-        state = {'checked': datetime.now(), 'state': check_status_with_remote_no_cache(repo, curr_tb)}
-        cache[key] = state
+        state = check_status_with_remote_no_cache(repo, curr_tb) #{'checked': datetime.now(), 'state': }
 
-    return state['state']
+        cache[key + " checked"] = str(time.time())
+        cache[key + " state"] = str(state)
+        
+    cache.close()
+
+    return state
 
 
 def check_status_with_remote_no_cache(repo, curr_tb):
