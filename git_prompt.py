@@ -1,5 +1,6 @@
 from git import *
 from colorama import init, Fore, Back, Style
+from sys import argv
 from git_prompt_remote import *
 
 try:
@@ -14,7 +15,8 @@ curr_tb = repo.head.ref.tracking_branch()                                   #=> 
 
 remote_color = Style.BRIGHT + Fore.RED
 if curr_tb:
-    remote_status = check_status_with_remote(repo, curr_tb)
+    invalidateCache = True if len(argv) > 1 and str(argv[1]) == "invalidate" else False
+    remote_status = check_status_with_remote(repo, curr_tb, invalidateCache)
 
     if remote_status == LocalRemoteState.UP_TO_DATE:
         remote_color = Fore.WHITE

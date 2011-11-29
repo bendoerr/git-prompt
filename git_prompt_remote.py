@@ -11,12 +11,14 @@ class LocalRemoteState:
     DIVERGED = 3
     AHEAD = 5
 
-def check_status_with_remote(repo, curr_tb):
+def check_status_with_remote(repo, curr_tb, invalidateCache):
     key = repo.git_dir + " " + curr_tb.path
 
     cache = anydbm.open('/cygdrive/c/sanctuary/home/bendoerr/.git_prompt', 'c')
 
-    if key + " checked" in cache and ((datetime.fromtimestamp(float(cache[key + " checked"])) + expire_after) > datetime.now()):
+    if invalidateCache == False and\
+       key + " checked" in cache and\
+       ((datetime.fromtimestamp(float(cache[key + " checked"])) + expire_after) > datetime.now()):
         state = int(cache[key + " state"])
     else:
         state = check_status_with_remote_no_cache(repo, curr_tb) #{'checked': datetime.now(), 'state': }
